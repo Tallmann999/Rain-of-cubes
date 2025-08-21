@@ -6,7 +6,7 @@ public class Spawner : MonoBehaviour
 {
     [SerializeField] private Cube _prefab;
     [SerializeField] private int _cubeCount = 100;
-
+    [SerializeField] private Color _defaultCubeColor = Color.white;
     private GenericObjectPool<Cube> _cubePool;
     private Vector3 _centralSpawnPoint;
     private Coroutine _currentCoroutine;
@@ -33,8 +33,9 @@ public class Spawner : MonoBehaviour
         for (int i = 0; i < _cubeCount; i++)
         {
             Cube newCube = _cubePool.GetObject();
+            newCube.ResetColor();// 
             yield return new WaitForSeconds((Random.Range(0, 2)));
-            newCube.transform.position = new Vector3((Random.Range(0, 4)), 6, Random.Range(2, 4));
+            newCube.transform.position = new Vector3((Random.Range(0, 2)), 6, Random.Range(0, 2));
             newCube.CubeReturn += ReturnPoolObject;
             Debug.Log("Здесь ждём появление нового куба");
             yield return null;
@@ -45,6 +46,7 @@ public class Spawner : MonoBehaviour
     {
         cube.CubeReturn -= ReturnPoolObject;
         _cubePool.ReturnObject(cube);
+        
         Debug.Log("Здесь возвращаем куб");
     }
 }

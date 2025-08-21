@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 public class Cube : MonoBehaviour
@@ -8,35 +9,49 @@ public class Cube : MonoBehaviour
     public event Action<Cube> CubeReturn;
     private Coroutine _currentCorutine;
     private Renderer _currentRenderer;
-    private float _lifeTime =3f;
+    private bool _isTouchPlatform = false;
+    private Color _defaultColor = Color.white;
 
     private void Awake()
     {
         _currentRenderer = GetComponent<Renderer>();
+        ResetColor();
+
     }
-   
+
     private void OnEnable()
     {
-        if (_currentCorutine != null)
-        {
-            StopCoroutine(_currentCorutine);
-        }
-
-        _currentCorutine = StartCoroutine(CubeLifecycleRoutine());
+        _isTouchPlatform = false;
+       ResetColor();
     }
 
     private void OnCollisionEnter(Collision collision)
-    {
-        //if (collision.)
-        //{
+    {     
+        if (collision.collider.TryGetComponent(out PlatformCollision component) == true)
+        {
+            if (!_isTouchPlatform)
+            {
+                _isTouchPlatform = true;
+                SetColor();
 
-        //}
+                if (_currentCorutine != null)
+                {
+                    StopCoroutine(_currentCorutine);
+                }
+
+                _currentCorutine = StartCoroutine(CubeLifecycleRoutine(Random.Range(2, 5)));
+            }
+        }
     }
 
-    private void SetRandomColor()
+    private void SetColor()
     {
-        _currentRenderer.material.color = UnityEngine.Random.ColorHSV();
+        _currentRenderer.material.color = Color.red;
+    }
 
+    public void ResetColor()
+    {
+        _currentRenderer.material.color = _defaultColor;
     }
 
     private void OnDisable()
@@ -46,16 +61,18 @@ public class Cube : MonoBehaviour
             StopCoroutine(_currentCorutine);
             _currentCorutine = null;
         }
+
+        _isTouchPlatform = false;
     }
 
-    private IEnumerator CubeLifecycleRoutine()
+    private IEnumerator CubeLifecycleRoutine(float lifeTime)
     {
         float time = 0f;
 
-        while (time < _lifeTime)
+        while (time < lifeTime)
         {
             time += Time.deltaTime;
-            yield return null; 
+            yield return null;
         }
 
         CubeReturn?.Invoke(this);

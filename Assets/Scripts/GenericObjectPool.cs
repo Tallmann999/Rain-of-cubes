@@ -38,6 +38,7 @@ public class GenericObjectPool<T> where T : Cube
 
     public void ReturnObject(T poolObject)
     {
+        poolObject.ResetColor();
         poolObject.gameObject.SetActive(false);
         Debug.Log("Возвращаем  префаб назад");
         _pool.Enqueue(poolObject);
