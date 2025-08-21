@@ -5,24 +5,46 @@ using UnityEngine;
 
 public class Cube : MonoBehaviour
 {
-    //private Rigidbody _rigidbody;
+    public event Action<Cube> CubeReturn;
     private Coroutine _currentCorutine;
     private Renderer _currentRenderer;
     private float _lifeTime =3f;
 
-    //private void OnCollisionEnter()
-    //{
-       
-    //    FindObjectOfType<Spawner>().ReturnPoolObject(this);
-
-    //           // ¬озвращаем куб в пул при столкновении с любой поверхностью
-    //}
-
-    private void Start()
+    private void Awake()
     {
-        if (_currentCorutine==null)
+        _currentRenderer = GetComponent<Renderer>();
+    }
+   
+    private void OnEnable()
+    {
+        if (_currentCorutine != null)
         {
-            _currentCorutine =  StartCoroutine(CubeLifecycleRoutine());
+            StopCoroutine(_currentCorutine);
+        }
+
+        _currentCorutine = StartCoroutine(CubeLifecycleRoutine());
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        //if (collision.)
+        //{
+
+        //}
+    }
+
+    private void SetRandomColor()
+    {
+        _currentRenderer.material.color = UnityEngine.Random.ColorHSV();
+
+    }
+
+    private void OnDisable()
+    {
+        if (_currentCorutine != null)
+        {
+            StopCoroutine(_currentCorutine);
+            _currentCorutine = null;
         }
     }
 
@@ -30,13 +52,13 @@ public class Cube : MonoBehaviour
     {
         float time = 0f;
 
-        while (time<_lifeTime)
+        while (time < _lifeTime)
         {
-            _currentRenderer.material.color = UnityEngine.Random.ColorHSV();
             time += Time.deltaTime;
-
-            yield return null; // ∆дем следующий кадр
+            yield return null; 
         }
-            FindObjectOfType<Spawner>().ReturnPoolObject(this);
+
+        CubeReturn?.Invoke(this);
+        Debug.Log("¬рем€ жизни истекло, возвращаем куб: " + this);
     }
 }

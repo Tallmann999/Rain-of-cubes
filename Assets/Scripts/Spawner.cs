@@ -1,36 +1,50 @@
-using System;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.Pool;
 using Random = UnityEngine.Random;
 
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private Cube _prefab;
-    [SerializeField] private Vector3 _centralSpawnPoint;
+    [SerializeField] private int _cubeCount = 100;
+
     private GenericObjectPool<Cube> _cubePool;
-    
+    private Vector3 _centralSpawnPoint;
+    private Coroutine _currentCoroutine;
+
+    private void Awake()
+    {
+        _centralSpawnPoint = transform.position;
+    }
 
     private void Start()
     {
-        _cubePool = new GenericObjectPool<Cube>(_prefab,10);
+        _cubePool = new GenericObjectPool<Cube>(_prefab, 10);
 
+        if (_currentCoroutine!=null)
+        {
+            StopCoroutine(CreateRandomCubeRain());
+        }
+
+        _currentCoroutine = StartCoroutine(CreateRandomCubeRain());
     }
 
-    public void CreateRandomCubeRain()
+    public IEnumerator CreateRandomCubeRain()
     {
-
-        for (int i = 0; i < _cubePool.CurrentCount; i++)
+        for (int i = 0; i < _cubeCount; i++)
         {
             Cube newCube = _cubePool.GetObject();
-            newCube.transform.position = new Vector3(Random.Range(0,2),6, Random.Range(2, 7));
+            yield return new WaitForSeconds((Random.Range(0, 2)));
+            newCube.transform.position = new Vector3((Random.Range(0, 4)), 6, Random.Range(2, 4));
+            newCube.CubeReturn += ReturnPoolObject;
+            Debug.Log("Здесь ждём появление нового куба");
+            yield return null;
         }
-        // Здесь пишем логику создание обьектов  в разных точках, колличество обьектов.
-
     }
 
     public void ReturnPoolObject(Cube cube)
     {
+        cube.CubeReturn -= ReturnPoolObject;
         _cubePool.ReturnObject(cube);
+        Debug.Log("Здесь возвращаем куб");
     }
-
 }

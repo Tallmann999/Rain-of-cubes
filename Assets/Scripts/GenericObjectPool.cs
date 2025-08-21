@@ -7,8 +7,7 @@ public class GenericObjectPool<T> where T : Cube
     private T _prefab;
     private Queue<T> _pool = new Queue<T>();
     private Transform _transform;
-    public int CurrentCount => _pool.Count;
-    public Transform TransformPosition => _transform;
+
     public GenericObjectPool(T prefab, int initializeSize)
     {
         _prefab = prefab;
@@ -19,6 +18,7 @@ public class GenericObjectPool<T> where T : Cube
             newObject.gameObject.SetActive(false);
             _pool.Enqueue(newObject);
         }
+
         Debug.Log("Здесь добавляем префабы в очередь");
     }
 
