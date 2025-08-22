@@ -3,55 +3,45 @@ using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-
+[RequireComponent(typeof(ColorChanger))]
 public class Cube : MonoBehaviour
 {
+    [SerializeField] private ColorChanger _colorChanger;
+
     public event Action<Cube> CubeReturn;
     private Coroutine _currentCorutine;
-    private Renderer _currentRenderer;
     private bool _isTouchPlatform = false;
-    private Color _defaultColor = Color.white;
 
     private void Awake()
     {
-        _currentRenderer = GetComponent<Renderer>();
-        ResetColor();
-
+        _colorChanger = GetComponent<ColorChanger>();
     }
 
     private void OnEnable()
     {
         _isTouchPlatform = false;
-       ResetColor();
     }
-
+       
     private void OnCollisionEnter(Collision collision)
-    {     
-        if (collision.collider.TryGetComponent(out PlatformCollision component) == true)
+    {
+        float minValue = 2;
+        float maxValue = 5;
+
+        if (collision.collider.TryGetComponent(out Platform component) == true)
         {
             if (!_isTouchPlatform)
             {
                 _isTouchPlatform = true;
-                SetColor();
+                _colorChanger.SetColor();
 
                 if (_currentCorutine != null)
                 {
                     StopCoroutine(_currentCorutine);
                 }
 
-                _currentCorutine = StartCoroutine(CubeLifecycleRoutine(Random.Range(2, 5)));
+                _currentCorutine = StartCoroutine(CubeLifecycleRoutine(Random.Range(minValue, maxValue)));
             }
         }
-    }
-
-    private void SetColor()
-    {
-        _currentRenderer.material.color = Color.red;
-    }
-
-    public void ResetColor()
-    {
-        _currentRenderer.material.color = _defaultColor;
     }
 
     private void OnDisable()
@@ -65,6 +55,11 @@ public class Cube : MonoBehaviour
         _isTouchPlatform = false;
     }
 
+    public void ResetColor()
+    {
+        _colorChanger.ResetColor();
+    }
+
     private IEnumerator CubeLifecycleRoutine(float lifeTime)
     {
         float time = 0f;
@@ -76,6 +71,5 @@ public class Cube : MonoBehaviour
         }
 
         CubeReturn?.Invoke(this);
-        Debug.Log("Время жизни истекло, возвращаем куб: " + this);
     }
 }
