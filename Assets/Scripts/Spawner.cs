@@ -43,14 +43,14 @@ public class Spawner : MonoBehaviour
             newCube.ResetColor();
             newCube.transform.position = new Vector3(Random.Range(minRandomValue, maxRandomValue),
                 transform.position.y, 0f);
-            newCube.CubeReturn += ReturnPoolObject;
+            newCube.CubeReturn += OnReturnPoolObject;
             yield return _waitForSecond;
         }
     }
 
-    private void ReturnPoolObject(Cube cube)
+    private void OnReturnPoolObject(Cube cube)
     {
-        cube.CubeReturn -= ReturnPoolObject;
+        cube.CubeReturn -= OnReturnPoolObject;
         _cubePool.ReturnObject(cube);
     }
 }
