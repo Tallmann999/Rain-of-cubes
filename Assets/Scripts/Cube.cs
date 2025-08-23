@@ -6,27 +6,29 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(ColorChanger))]
 public class Cube : MonoBehaviour
 {
-    [SerializeField] private ColorChanger _colorChanger;
+    [SerializeField] private ColorChanger _colorChanger;      
 
-    public event Action<Cube> CubeReturn;
+    private WaitForSeconds _waitForSeconds;
     private Coroutine _currentCorutine;
     private bool _isTouchPlatform = false;
+    private float _minLifeTimeValue = 2f;
+    private float _maxLifeTimeValue = 5f;
+
+    public event Action<Cube> CubeReturn;
 
     private void Awake()
     {
         _colorChanger = GetComponent<ColorChanger>();
+        _waitForSeconds = new WaitForSeconds(Random.Range(_minLifeTimeValue, _maxLifeTimeValue));
     }
-
+    
     private void OnEnable()
     {
         _isTouchPlatform = false;
     }
        
     private void OnCollisionEnter(Collision collision)
-    {
-        float minValue = 2;
-        float maxValue = 5;
-
+    {   
         if (collision.collider.TryGetComponent(out Platform component) == true)
         {
             if (!_isTouchPlatform)
@@ -39,7 +41,7 @@ public class Cube : MonoBehaviour
                     StopCoroutine(_currentCorutine);
                 }
 
-                _currentCorutine = StartCoroutine(CubeLifecycleRoutine(Random.Range(minValue, maxValue)));
+                _currentCorutine = StartCoroutine(CubeLifecycleRoutine());
             }
         }
     }
@@ -60,16 +62,9 @@ public class Cube : MonoBehaviour
         _colorChanger.ResetColor();
     }
 
-    private IEnumerator CubeLifecycleRoutine(float lifeTime)
+    private IEnumerator CubeLifecycleRoutine()
     {
-        float time = 0f;
-
-        while (time < lifeTime)
-        {
-            time += Time.deltaTime;
-            yield return null;
-        }
-
+        yield return _waitForSeconds;
         CubeReturn?.Invoke(this);
     }
 }

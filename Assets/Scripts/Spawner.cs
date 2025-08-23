@@ -9,8 +9,8 @@ public class Spawner : MonoBehaviour
 
     private GenericObjectPool<Cube> _cubePool;
     private Coroutine _currentCoroutine;
-    private int _poolObjectCount = 10;
     private WaitForSeconds _waitForSecond;
+    private int _poolObjectCount = 10;
     private float _minLiveTimeValue = 0f;
     private float _maxLiveTimeValue = 1f;
 
