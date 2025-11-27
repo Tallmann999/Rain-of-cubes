@@ -3,21 +3,21 @@ using UnityEngine;
 [RequireComponent(typeof(Renderer))]
 public class ColorChanger : MonoBehaviour
 {
-    private Renderer _currentRenderel;
+    private Renderer _currentRenderer;
     private Color _defaltColor = Color.white;
 
     private void Awake()
     {
-        _currentRenderel = GetComponent<Renderer>();
+        _currentRenderer = GetComponent<Renderer>();
     }
 
     public void SetColor()
     {
-        _currentRenderel.material.color = Random.ColorHSV();
+        _currentRenderer.material.color = Random.ColorHSV();
     }
 
     public void ResetColor()
     {
-        _currentRenderel.material.color = _defaltColor;
+        _currentRenderer.material.color = _defaltColor;
     }
 }

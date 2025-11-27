@@ -44,7 +44,7 @@ public class Cube : MonoBehaviour, ISpawnable<Cube>
 
     private IEnumerator FailSafeDestroy()
     {
-        yield return _liveTimeValue;
+        yield return _waitForSecondsToDestroy;
 
         if (!_isTouchPlatform)
             ReturnToPool();
